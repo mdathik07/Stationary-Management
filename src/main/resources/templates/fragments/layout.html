@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | PrintXchange'">PrintXchange</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar" th:fragment="navbar">
+    <a class="brand" th:href="@{/}">🖨️ PrintXchange</a>
+    <div class="nav-links">
+        <th:block sec:authorize="hasAuthority('STUDENT')">
+            <a th:href="@{/student/dashboard}">Dashboard</a>
+            <a th:href="@{/student/upload-order}">Place Order</a>
+            <a th:href="@{/student/my-orders}">My Orders</a>
+            <a th:href="@{/student/items}">Exchange</a>
+            <a th:href="@{/student/my-items}">My Items</a>
+        </th:block>
+        <th:block sec:authorize="hasAuthority('ADMIN')">
+            <a th:href="@{/admin/dashboard}">Dashboard</a>
+            <a th:href="@{/admin/orders}">Print Orders</a>
+        </th:block>
+    </div>
+    <div class="nav-user">
+        <th:block sec:authorize="isAuthenticated()">
+            <span sec:authentication="name">user</span>
+            <form th:action="@{/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+            </form>
+        </th:block>
+        <th:block sec:authorize="!isAuthenticated()">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/register}" class="btn btn-sm">Register</a>
+        </th:block>
+    </div>
+</nav>
+
+<div th:fragment="flash">
+    <div class="flash flash-success" th:if="${success}" th:text="${success}"></div>
+    <div class="flash flash-error" th:if="${error}" th:text="${error}"></div>
+</div>
+
+</body>
+</html>

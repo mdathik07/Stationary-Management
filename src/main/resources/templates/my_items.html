@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Items')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h2>📦 My Posted Items</h2>
+
+    <div class="card" th:if="${#lists.isEmpty(items)}" style="text-align:center">
+        <p>You haven't posted anything yet.</p>
+        <a th:href="@{/student/post-item}" class="btn">Post your first item</a>
+    </div>
+
+    <div class="card table-wrap" th:unless="${#lists.isEmpty(items)}" style="padding:0">
+        <table>
+            <thead>
+            <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Interest</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.itemName}"></td>
+                <td th:text="${item.category} ?: '—'"></td>
+                <td th:text="${item.price != null} ? '₹' + ${item.price} : 'Negotiable'"></td>
+                <td th:text="${item.interestCount} + ' interested'"></td>
+                <td>
+                    <span class="badge" th:classappend="${item.available} ? 'badge-available' : 'badge-muted'"
+                          th:text="${item.available} ? 'Available' : 'Sold'"></span>
+                </td>
+                <td style="white-space:nowrap">
+                    <form th:if="${item.available}" th:action="@{/student/items/{id}/mark-sold(id=${item.id})}"
+                          method="post" style="display:inline">
+                        <button type="submit" class="btn btn-secondary btn-sm">Mark Sold</button>
+                    </form>
+                    <form th:action="@{/student/items/{id}/delete(id=${item.id})}" method="post" style="display:inline"
+                          onsubmit="return confirm('Remove this listing permanently?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

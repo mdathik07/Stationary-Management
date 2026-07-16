@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Exchange Items')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h2>🔁 Exchange Items</h2>
+
+    <form th:action="@{/student/items}" method="get" class="filter-bar">
+        <input type="text" name="q" th:value="${q}" placeholder="Search items…" style="flex:1; min-width:180px"/>
+        <select name="category">
+            <option value="">All categories</option>
+            <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"
+                    th:selected="${c == selectedCategory}"></option>
+        </select>
+        <button type="submit" class="btn">Search</button>
+        <a th:href="@{/student/post-item}" class="btn btn-secondary">➕ Post an Item</a>
+    </form>
+
+    <div class="card" th:if="${#lists.isEmpty(items)}" style="text-align:center">
+        <p>No items match — try a different search, or be the first to post one!</p>
+    </div>
+
+    <div class="item-grid" th:unless="${#lists.isEmpty(items)}">
+        <div class="item-card" th:each="item : ${items}">
+            <img th:if="${item.image != null}" th:src="@{/student/items/{id}/image(id=${item.id})}" alt=""/>
+            <div class="placeholder" th:if="${item.image == null}">📦</div>
+            <div class="body">
+                <span class="name" th:text="${item.itemName}"></span>
+                <span class="badge badge-muted" th:if="${item.category}" th:text="${item.category}"></span>
+                <span class="price" th:text="${item.price != null} ? '₹' + ${item.price} : 'Negotiable'"></span>
+                <p class="hint" th:text="${#strings.abbreviate(item.description ?: '', 90)}"></p>
+                <div class="actions">
+                    <a th:href="@{/student/interest/{id}(id=${item.id})}" class="btn btn-sm">I'm Interested</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

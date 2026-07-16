@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h2>Hi, <span sec:authentication="name">student</span> 👋</h2>
+    <p class="subtitle">What would you like to do today?</p>
+
+    <div class="quick-links" style="margin-top:24px">
+        <a class="card-link" th:href="@{/student/upload-order}">
+            📄 Place a Print Order
+            <span class="desc">Upload a PDF and get an instant price.</span>
+        </a>
+        <a class="card-link" th:href="@{/student/my-orders}">
+            📋 My Orders
+            <span class="desc">Track status and pickup codes.</span>
+        </a>
+        <a class="card-link" th:href="@{/student/items}">
+            🔁 Browse Exchange Items
+            <span class="desc">Used books, calculators and more.</span>
+        </a>
+        <a class="card-link" th:href="@{/student/post-item}">
+            ➕ Post an Item
+            <span class="desc">Sell or give away your old stuff.</span>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Place Print Order')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page page-narrow">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="card">
+        <h2>📄 Place a Print Order</h2>
+        <p class="subtitle">
+            Rates: <strong th:text="'₹' + ${pricing.bwPerPage} + '/page (B&W)'"></strong> ·
+            <strong th:text="'₹' + ${pricing.colorPerPage} + '/page (Color)'"></strong>.
+            The exact price is calculated from your PDF's page count when you submit.
+        </p>
+
+        <form th:action="@{/student/upload-order}" method="post" enctype="multipart/form-data" class="stacked">
+            <label for="file">PDF document (max 10 MB)</label>
+            <input type="file" id="file" name="file" accept="application/pdf" required/>
+
+            <label for="printType">Print type</label>
+            <select id="printType" name="printType" required>
+                <option value="BW">Black &amp; White</option>
+                <option value="COLOR">Color</option>
+            </select>
+
+            <label for="copies">Number of copies</label>
+            <input type="number" id="copies" name="copies" min="1" max="100" value="1" required/>
+
+            <label style="display:flex; align-items:center; gap:8px; font-weight:400">
+                <input type="checkbox" name="doubleSided" value="true" style="width:auto"/>
+                Double-sided printing
+            </label>
+
+            <label for="notes">Notes for the shop (optional)</label>
+            <textarea id="notes" name="notes" rows="2" maxlength="500"
+                      placeholder="e.g. print pages 1–10 only, spiral binding"></textarea>
+
+            <button type="submit" class="btn" style="margin-top:16px">Upload &amp; Get Price</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

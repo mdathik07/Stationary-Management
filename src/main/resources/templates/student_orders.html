@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Orders')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h2>📋 My Print Orders</h2>
+
+    <div class="card" th:if="${#lists.isEmpty(orders)}" style="text-align:center">
+        <p>You haven't placed any orders yet.</p>
+        <a th:href="@{/student/upload-order}" class="btn">Place your first order</a>
+    </div>
+
+    <div class="card table-wrap" th:unless="${#lists.isEmpty(orders)}" style="padding:0">
+        <table>
+            <thead>
+            <tr>
+                <th>Pickup Code</th>
+                <th>File</th>
+                <th>Details</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Placed</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td><span class="order-code" th:text="${order.orderId}"></span></td>
+                <td th:text="${order.fileName}"></td>
+                <td>
+                    <span th:text="${order.pageCount} + ' pg × ' + ${order.numberOfCopies} + ' · ' + ${order.printType.displayName}"></span>
+                    <span th:if="${order.doubleSided}" class="hint">· double-sided</span>
+                </td>
+                <td th:text="'₹' + ${order.totalPrice}"></td>
+                <td>
+                    <span class="badge" th:classappend="'status-' + ${order.status.name()}"
+                          th:text="${order.status.displayName}"></span>
+                    <div class="hint" th:if="${order.readyAt != null and order.status.name() == 'READY'}"
+                         th:text="'ready ' + ${#temporals.format(order.readyAt, 'dd MMM HH:mm')}"></div>
+                </td>
+                <td th:text="${#temporals.format(order.createdAt, 'dd MMM, HH:mm')}"></td>
+                <td>
+                    <form th:if="${order.status.name() == 'PENDING'}"
+                          th:action="@{/student/orders/{id}/cancel(id=${order.id})}" method="post"
+                          onsubmit="return confirm('Cancel this order?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

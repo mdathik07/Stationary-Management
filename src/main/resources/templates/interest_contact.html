@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Contact Seller')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page page-narrow">
+    <div class="card">
+        <h2 th:text="${item.itemName}">Item</h2>
+        <p class="subtitle">
+            <span class="badge badge-muted" th:if="${item.category}" th:text="${item.category}"></span>
+            <strong th:text="${item.price != null} ? ' ₹' + ${item.price} : ' Negotiable'"></strong>
+        </p>
+        <p th:text="${item.description}"></p>
+
+        <h3>Contact the seller</h3>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Name</th><td th:text="${seller != null ? seller.name : 'Unknown'}"></td></tr>
+                <tr><th>Email</th><td th:text="${seller != null ? seller.email : '—'}"></td></tr>
+                <tr><th>Phone</th><td th:text="${seller != null ? seller.contact : '—'}"></td></tr>
+            </table>
+        </div>
+        <p class="hint">Meet on campus and inspect the item before paying.</p>
+
+        <a th:href="@{/student/items}" class="btn btn-secondary">← Back to Items</a>
+    </div>
+</div>
+
+</body>
+</html>

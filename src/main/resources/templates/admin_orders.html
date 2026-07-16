@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Print Orders')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h2>📋 Print Orders</h2>
+
+    <div class="filter-bar">
+        <div class="tabs">
+            <a th:href="@{/admin/orders(filter='active')}" th:classappend="${filter == 'active'} ? 'active'">Active Queue</a>
+            <a th:href="@{/admin/orders(filter='all')}" th:classappend="${filter == 'all'} ? 'active'">All</a>
+            <a th:each="s : ${statuses}" th:href="@{/admin/orders(filter=${s.name()})}"
+               th:classappend="${filter == s.name()} ? 'active'" th:text="${s.displayName}"></a>
+        </div>
+        <form th:action="@{/admin/orders}" method="get" style="display:flex; gap:8px; margin-left:auto">
+            <input type="text" name="search" th:value="${search}" placeholder="Find by pickup code…"/>
+            <button type="submit" class="btn btn-sm">Find</button>
+        </form>
+    </div>
+
+    <div class="card" th:if="${#lists.isEmpty(orders)}" style="text-align:center">
+        <p>No orders here. 🎉</p>
+    </div>
+
+    <div class="card table-wrap" th:unless="${#lists.isEmpty(orders)}" style="padding:0">
+        <table>
+            <thead>
+            <tr>
+                <th>Pickup Code</th>
+                <th>Student</th>
+                <th>File</th>
+                <th>Details</th>
+                <th>Price</th>
+                <th>Placed</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td><span class="order-code" th:text="${order.orderId}"></span></td>
+                <td>
+                    <span th:text="${order.user != null ? order.user.name : '—'}"></span>
+                    <div class="hint" th:if="${order.user != null}"
+                         th:text="${order.user.rollNumber ?: ''} + ' · ' + ${order.user.contact ?: ''}"></div>
+                </td>
+                <td>
+                    <a th:href="@{/admin/orders/{id}/file(id=${order.id})}" target="_blank"
+                       th:text="${order.fileName}">file.pdf</a>
+                    <div class="hint">
+                        <a th:href="@{/admin/orders/{id}/file(id=${order.id}, dl=1)}">download</a>
+                    </div>
+                </td>
+                <td>
+                    <span th:text="${order.pageCount} + ' pg × ' + ${order.numberOfCopies} + ' · ' + ${order.printType.displayName}"></span>
+                    <span class="hint" th:if="${order.doubleSided}">· double-sided</span>
+                    <div class="hint" th:if="${order.notes}" th:text="'📝 ' + ${order.notes}"></div>
+                </td>
+                <td th:text="'₹' + ${order.totalPrice}"></td>
+                <td th:text="${#temporals.format(order.createdAt, 'dd MMM, HH:mm')}"></td>
+                <td>
+                    <span class="badge" th:classappend="'status-' + ${order.status.name()}"
+                          th:text="${order.status.displayName}"></span>
+                </td>
+                <td style="white-space:nowrap">
+                    <form th:if="${order.status.next() != null}"
+                          th:action="@{/admin/orders/{id}/advance(id=${order.id})}" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-sm"
+                                th:text="'→ ' + ${order.status.next().displayName}">Advance</button>
+                    </form>
+                    <form th:if="${order.status.terminal}"
+                          th:action="@{/admin/orders/{id}/delete(id=${order.id})}" method="post" style="display:inline"
+                          onsubmit="return confirm('Delete this order permanently?')">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

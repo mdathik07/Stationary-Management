@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Register')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page page-narrow">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+
+    <div class="card">
+        <h2>Create your student account</h2>
+        <p class="subtitle">Order prints and trade used items on campus.</p>
+        <form th:action="@{/register}" method="post" th:object="${userDto}" class="stacked">
+            <label for="name">Full name</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Full Name" required/>
+            <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="you@college.edu" required/>
+            <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
+            <label for="rollNumber">Roll number / USN</label>
+            <input type="text" id="rollNumber" th:field="*{rollNumber}" placeholder="e.g. 1XX22CS001" required/>
+            <span class="field-error" th:if="${#fields.hasErrors('rollNumber')}" th:errors="*{rollNumber}"></span>
+
+            <label for="contact">Contact number</label>
+            <input type="text" id="contact" th:field="*{contact}" placeholder="Phone number" required/>
+            <span class="field-error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></span>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="At least 8 characters" required/>
+            <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
+            <button type="submit" class="btn" style="margin-top:16px">Register</button>
+        </form>
+        <p style="text-align:center; margin-bottom:0">
+            Already have an account? <a th:href="@{/login}">Login</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Order Placed')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page page-narrow">
+    <div class="card" style="text-align:center">
+        <div style="font-size:2.5em">✅</div>
+        <h2>Order placed!</h2>
+        <p class="subtitle">Show this code at the counter when you pick up:</p>
+        <p style="font-size:1.8em"><span class="order-code" th:text="${order.orderId}">ORD-XXXX</span></p>
+
+        <div class="table-wrap" style="margin: 20px 0">
+            <table>
+                <tr><th>File</th><td th:text="${order.fileName}"></td></tr>
+                <tr><th>Pages</th><td th:text="${order.pageCount}"></td></tr>
+                <tr><th>Type</th><td th:text="${order.printType.displayName} + (${order.doubleSided} ? ' · double-sided' : '')"></td></tr>
+                <tr><th>Copies</th><td th:text="${order.numberOfCopies}"></td></tr>
+                <tr><th>Amount to pay</th><td><strong th:text="'₹' + ${order.totalPrice}"></strong></td></tr>
+            </table>
+        </div>
+
+        <a th:href="@{/student/my-orders}" class="btn">Track My Orders</a>
+        <a th:href="@{/student/upload-order}" class="btn btn-secondary">Place Another</a>
+    </div>
+</div>
+
+</body>
+</html>

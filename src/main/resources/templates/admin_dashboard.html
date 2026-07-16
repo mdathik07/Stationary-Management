@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h2>🛠 Shop Dashboard</h2>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="value" th:text="${stats.pendingCount}">0</div>
+            <div class="label">Pending</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${stats.printingCount}">0</div>
+            <div class="label">Printing</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${stats.readyCount}">0</div>
+            <div class="label">Ready for pickup</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="${stats.todayOrders}">0</div>
+            <div class="label">Orders today</div>
+        </div>
+        <div class="stat">
+            <div class="value" th:text="'₹' + ${stats.todayRevenue}">₹0</div>
+            <div class="label">Revenue today</div>
+        </div>
+    </div>
+
+    <a th:href="@{/admin/orders}" class="btn">Open Print Queue →</a>
+</div>
+
+</body>
+</html>

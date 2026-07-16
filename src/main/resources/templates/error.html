@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="page page-narrow">
+    <div class="card" style="text-align:center">
+        <div style="font-size:2.5em">😕</div>
+        <h2>Something went wrong</h2>
+        <p th:text="${message} ?: 'The page you requested could not be processed.'"></p>
+        <a th:href="@{/home}" class="btn">Back to Home</a>
+    </div>
+</div>
+
+</body>
+</html>
