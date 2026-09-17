@@ -17,7 +17,7 @@ RUN mkdir -p /logs
 
 COPY --from=build /app/target/*.jar app.jar
 
-RUN useradd -m -u 1000 appuser && \
+RUN useradd -m appuser && \
     chown -R appuser:appuser /app /logs
 
 USER appuser
