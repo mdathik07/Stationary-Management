@@ -6,18 +6,24 @@
 
 set -e
 
+# Run every apt/dpkg step non-interactively so the script never blocks on a
+# debconf prompt (e.g. "restart services?" or "keep local config?") when run
+# over a non-interactive SSH session.
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
 echo "=========================================="
 echo "Setting up EC2 for PrintXchange"
 echo "=========================================="
 
 # Update system
 echo "Updating system packages..."
-sudo apt-get update
-sudo apt-get upgrade -y
+sudo -E apt-get update
+sudo -E apt-get upgrade -y -o Dpkg::Options::="--force-confold"
 
 # Install Docker
 echo "Installing Docker..."
-sudo apt-get install -y \
+sudo -E apt-get install -y \
     ca-certificates \
     curl \
     gnupg \
@@ -33,8 +39,8 @@ echo \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install Docker packages
-sudo apt-get update
-sudo apt-get install -y \
+sudo -E apt-get update
+sudo -E apt-get install -y \
     docker-ce \
     docker-ce-cli \
     containerd.io \
@@ -45,7 +51,7 @@ sudo usermod -aG docker ${USER}
 
 # Install monitoring tools
 echo "Installing monitoring tools..."
-sudo apt-get install -y htop curl wget
+sudo -E apt-get install -y htop curl wget
 
 # Create deployment directory — this is where the CI/CD pipeline `cd`s into
 echo "Creating deployment directory..."
@@ -144,10 +150,11 @@ cat | sudo tee /etc/logrotate.d/printxchange << 'EOF'
 }
 EOF
 
-# Set up automatic security updates
+# Set up automatic security updates (installed with sane non-interactive
+# defaults; skip dpkg-reconfigure, which opens an interactive debconf prompt
+# that would hang a non-interactive SSH session)
 echo "Setting up automatic security updates..."
-sudo apt-get install -y unattended-upgrades
-sudo dpkg-reconfigure -plow unattended-upgrades
+sudo -E apt-get install -y unattended-upgrades
 
 # Enable Docker service
 echo "Enabling Docker service..."
