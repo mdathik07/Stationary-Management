@@ -103,7 +103,7 @@ services:
         condition: service_healthy
 
     environment:
-      DB_URL: "jdbc:mysql://mysql:3306/printxchange?useSSL=false&serverTimezone=UTC"
+      DB_URL: "jdbc:mysql://mysql:3306/printxchange?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
       DB_USERNAME: printxchange
       DB_PASSWORD: ${DB_PASSWORD}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
