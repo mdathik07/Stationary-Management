@@ -1,0 +1,56 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: printxchange-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: printxchange
+      MYSQL_USER: printxchange
+      MYSQL_PASSWORD: printxchange
+      MYSQL_ROOT_PASSWORD: printxchange
+      TZ: UTC
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - printxchange-mysql-data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pprintxchange"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  printxchange:
+    image: ${DOCKERHUB_USERNAME:-yourdockerhubuser}/printxchange:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: printxchange
+
+    restart: unless-stopped
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    environment:
+      DB_URL: "jdbc:mysql://mysql:3306/printxchange?useSSL=false&serverTimezone=UTC"
+      DB_USERNAME: printxchange
+      DB_PASSWORD: printxchange
+
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@printxchange.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme123}
+      ADMIN_NAME: ${ADMIN_NAME:-Shop Admin}
+
+    ports:
+      - "8081:8081"
+
+
+volumes:
+  printxchange-mysql-data:

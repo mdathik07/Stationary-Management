@@ -75,3 +75,47 @@ docker run -p 8081:8081 -e DB_URL=... -e DB_USERNAME=... -e DB_PASSWORD=... prin
 
 Note: Render's free tier sleeps after ~15 minutes of inactivity; the first
 request afterwards takes ~30–50 s.
+
+## 🚢 CI/CD deployment to AWS (EC2 + Docker Hub)
+
+Pushes to `main` run a GitHub Actions pipeline (`.github/workflows/ci.yml`)
+that tests the app, builds/pushes a Docker image, then deploys it to an EC2
+instance over SSH:
+
+1. **Build and Test** — runs `./mvnw clean test` on every push and PR.
+2. **Build and Push Docker Image** — builds the image from the `Dockerfile`
+   and pushes `printxchange:<commit-sha>` and `printxchange:latest` to Docker Hub.
+3. **Deploy to EC2** — SSHes into the EC2 instance, runs
+   `docker compose pull printxchange && docker compose up -d printxchange`
+   in `~/printxchange`, and polls the container's health check until it
+   reports healthy.
+
+### One-time EC2 setup
+
+1. Launch an Ubuntu EC2 instance, open inbound ports `22` and `80` (or `8081`)
+   in its security group.
+2. Copy `scripts/setup-ec2.sh` to the instance and run it:
+   ```bash
+   scp scripts/setup-ec2.sh ubuntu@<EC2_HOST>:~
+   ssh ubuntu@<EC2_HOST> "chmod +x setup-ec2.sh && ./setup-ec2.sh"
+   ```
+   This installs Docker/Docker Compose, writes a production
+   `~/printxchange/docker-compose.yaml` (MySQL + app, image pulled from Docker
+   Hub), and creates `~/printxchange/.env.template`.
+3. On the instance, fill in real values and start the stack once manually:
+   ```bash
+   cp ~/printxchange/.env.template ~/printxchange/.env
+   nano ~/printxchange/.env
+   cd ~/printxchange && docker compose up -d
+   ```
+
+### GitHub repository secrets
+
+| Secret | Purpose |
+|---|---|
+| `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` | Push images to Docker Hub |
+| `EC2_HOST` | Public IP/DNS of the EC2 instance |
+| `EC2_USERNAME` | SSH user (e.g. `ubuntu`) |
+| `EC2_SSH_PRIVATE_KEY` | Private key matching the instance's key pair |
+
+Once these are set, every push to `main` automatically redeploys the app.
