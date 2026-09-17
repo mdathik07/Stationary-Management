@@ -8,9 +8,16 @@ set -e
 
 # Run every apt/dpkg step non-interactively so the script never blocks on a
 # debconf prompt (e.g. "restart services?" or "keep local config?") when run
-# over a non-interactive SSH session.
-export DEBIAN_FRONTEND=noninteractive
-export NEEDRESTART_MODE=a
+# over a non-interactive SSH session. `sudo env VAR=val ...` is used instead
+# of `sudo -E` because some AMIs' sudoers policy silently ignores -E.
+# Acquire::Retries/Timeout add tolerance for flaky network conditions.
+apt_get() {
+    sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get \
+        -o Acquire::Retries=5 \
+        -o Acquire::http::Timeout=60 \
+        -o Acquire::https::Timeout=60 \
+        "$@"
+}
 
 echo "=========================================="
 echo "Setting up EC2 for PrintXchange"
@@ -18,12 +25,12 @@ echo "=========================================="
 
 # Update system
 echo "Updating system packages..."
-sudo -E apt-get update
-sudo -E apt-get upgrade -y -o Dpkg::Options::="--force-confold"
+apt_get update
+apt_get upgrade -y -o Dpkg::Options::="--force-confold"
 
 # Install Docker
 echo "Installing Docker..."
-sudo -E apt-get install -y \
+apt_get install -y \
     ca-certificates \
     curl \
     gnupg \
@@ -39,8 +46,8 @@ echo \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install Docker packages
-sudo -E apt-get update
-sudo -E apt-get install -y \
+apt_get update
+apt_get install -y \
     docker-ce \
     docker-ce-cli \
     containerd.io \
@@ -51,7 +58,7 @@ sudo usermod -aG docker ${USER}
 
 # Install monitoring tools
 echo "Installing monitoring tools..."
-sudo -E apt-get install -y htop curl wget
+apt_get install -y htop curl wget
 
 # Create deployment directory — this is where the CI/CD pipeline `cd`s into
 echo "Creating deployment directory..."
@@ -154,7 +161,7 @@ EOF
 # defaults; skip dpkg-reconfigure, which opens an interactive debconf prompt
 # that would hang a non-interactive SSH session)
 echo "Setting up automatic security updates..."
-sudo -E apt-get install -y unattended-upgrades
+apt_get install -y unattended-upgrades
 
 # Enable Docker service
 echo "Enabling Docker service..."
